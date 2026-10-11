@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dekktrykk-kalkulator</title>
+<meta name="description" content="Finn raskeste og mest fornuftige dekktrykk foran og bak for landevei, grus og terrengsykkel – basert på Silcas modell. Laget for mobil.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#EDE8DF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1C1E" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dekktrykk">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="nb_NO">
+<meta property="og:title" content="Dekktrykk-kalkulator">
+<meta property="og:description" content="Finn raskeste og mest fornuftige dekktrykk foran og bak for landevei, grus og terrengsykkel.">
+<meta property="og:image" content="https://trymrepseth99-cpu.github.io/Dekktrykk-Kalkulator/icon-512.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" as="font" type="font/woff2" href="fonts/archivo-latin.woff2" crossorigin>
+<style>
+  @font-face{font-family:"Archivo";font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/archivo-latin.woff2) format("woff2");}
+  @font-face{font-family:"Rajdhani";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/rajdhani-500.woff2) format("woff2");}
+  @font-face{font-family:"Rajdhani";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/rajdhani-600.woff2) format("woff2");}
+  @font-face{font-family:"Rajdhani";font-style:normal;font-weight:700;font-display:swap;src:url(fonts/rajdhani-700.woff2) format("woff2");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/plexmono-500.woff2) format("woff2");}
+  @font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:600;font-display:swap;src:url(fonts/plexmono-600.woff2) format("woff2");}
+
+  :root{
+    color-scheme:light dark;
+    --paper:#EDE8DF;
+    --paper-raised:#F8F5EF;
+    --ink:#1E2023;
+    --ink-soft:#5A5650;
+    --line:#D9D2C2;
+    --accent:#2B6E6B;
+    --accent-2:#B9832A;
+    --safe:#3F7A5E;
+    --danger:#B2412F;
+    --shadow:rgba(30,32,35,0.10);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#1B1C1E;
+      --paper-raised:#242628;
+      --ink:#F1EEE7;
+      --ink-soft:#B9B4A9;
+      --line:#3A3B3C;
+      --accent:#57C2BC;
+      --accent-2:#E0A94B;
+      --safe:#5FA97D;
+      --danger:#E2685A;
+      --shadow:rgba(0,0,0,0.45);
+    }
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:16px;
+  }
+  [hidden]{display:none !important;}
+  button,select,input,summary,label{touch-action:manipulation;}
+  h1,h2,.display{
+    font-family:"Rajdhani",system-ui,sans-serif;
+    text-wrap:balance;
+  }
+  .mono{
+    font-family:"IBM Plex Mono","SF Mono",Menlo,"Courier New",monospace;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .app{
+    max-width:1040px;
+    margin:0 auto;
+    padding:28px 20px 40px;
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+  }
+
+  .masthead{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding-bottom:18px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    margin:0;
+    font-family:"Rajdhani",system-ui,sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    color:var(--accent);
+    text-transform:uppercase;
+  }
+  h1{
+    margin:0;
+    font-weight:700;
+    font-size:clamp(28px,4vw,38px);
+    letter-spacing:0.01em;
+  }
+  .lede{
+    margin:2px 0 0;
+    max-width:60ch;
+    color:var(--ink-soft);
+    font-size:15px;
+    line-height:1.55;
+  }
+
+  .board{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);
+    gap:20px;
+    align-items:start;
+  }
+
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  fieldset{
+    border:none;
+    margin:0;
+    padding:0;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  legend{
+    font-family:"Rajdhani",system-ui,sans-serif;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding:0 0 8px;
+    width:100%;
+    border-bottom:1px solid var(--line);
+    margin-bottom:2px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+  }
+  label{
+    font-size:14px;
+    font-weight:600;
+  }
+  .field-hint{
+    font-size:12px;
+    color:var(--ink-soft);
+    line-height:1.45;
+  }
+  .field-hint.warn{color:var(--danger);}
+  .value-chip{
+    font-family:"IBM Plex Mono",monospace;
+    font-weight:600;
+    font-size:14px;
+    color:var(--accent);
+  }
+  input[type="number"],
+  select{
+    width:100%;
+    min-height:46px;
+    padding:9px 12px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Mono",monospace;
+    font-size:16px;
+  }
+  select{font-family:"Archivo",system-ui,sans-serif;}
+  input[type="number"]:focus-visible,
+  input[type="range"]:focus-visible,
+  select:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  input[type="range"]{
+    width:100%;
+    margin:6px 0;
+    accent-color:var(--accent);
+  }
+  input[type="checkbox"]{
+    accent-color:var(--accent);
+    width:22px;
+    height:22px;
+    flex:none;
+  }
+  .tick-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    padding:0 2px;
+  }
+
+  .segmented{
+    display:flex;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .segmented button{
+    flex:1;
+    min-height:44px;
+    padding:8px 6px;
+    background:var(--paper);
+    color:var(--ink-soft);
+    border:none;
+    border-right:1px solid var(--line);
+    font-family:"Archivo",system-ui,sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .segmented button:last-child{border-right:none;}
+  .segmented button.is-active{
+    background:var(--accent);
+    color:var(--paper-raised);
+  }
+
+  .switch-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-height:44px;
+  }
+  .switch-row label{cursor:pointer;}
+
+  details.advanced{
+    border-top:1px solid var(--line);
+    padding-top:6px;
+  }
+  details.advanced summary{
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+    color:var(--accent);
+    list-style:none;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+  }
+  details.advanced summary::-webkit-details-marker{display:none;}
+  details.advanced summary::before{
+    content:"+ ";
+    white-space:pre;
+  }
+  details.advanced[open] summary::before{
+    content:"– ";
+  }
+  details.advanced .field{margin:8px 0 6px;}
+
+  .readout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .gauge-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 12px 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    box-shadow:0 6px 18px var(--shadow);
+    min-width:0;
+  }
+  .gauge-card h2{
+    margin:0 0 4px;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .gauge-card[data-wheel="front"] h2{color:var(--accent);}
+  .gauge-card[data-wheel="rear"] h2{color:var(--accent-2);}
+  .gauge-card svg{width:100%;max-width:220px;height:auto;}
+  @media (prefers-reduced-motion:no-preference){
+    .needle{transition:transform .5s cubic-bezier(.3,1,.4,1);}
+    .zone-arc{transition:d .3s ease;}
+  }
+  .reading{
+    display:flex;
+    align-items:baseline;
+    gap:5px;
+    margin-top:-6px;
+  }
+  .bar-value{
+    font-size:34px;
+    font-weight:600;
+  }
+  .unit{
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .psi{
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .clamp-note{
+    font-size:11px;
+    color:var(--danger);
+    text-align:center;
+    max-width:22ch;
+    margin:0;
+  }
+
+  .alerts{
+    grid-column:1 / -1;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .alerts:empty{display:none;}
+  .alert{
+    border-left:3px solid var(--accent-2);
+    background:var(--paper-raised);
+    border-radius:0 10px 10px 0;
+    padding:12px 16px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .alert.severe{border-left-color:var(--danger);}
+  .alert strong{color:var(--ink);}
+
+  .notes{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .callout{
+    border-left:3px solid var(--danger);
+    background:var(--paper-raised);
+    border-radius:0 10px 10px 0;
+    padding:12px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .callout-label{
+    margin:0;
+    font-family:"Rajdhani",sans-serif;
+    font-weight:700;
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--danger);
+  }
+  .callout p{margin:0;font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+  .method{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .method summary{
+    cursor:pointer;
+    font-weight:600;
+    color:var(--ink);
+    min-height:44px;
+    display:flex;
+    align-items:center;
+  }
+  .method p{line-height:1.6;max-width:70ch;margin:8px 0 0;}
+  .method p + p{margin-top:10px;}
+  .foot{
+    margin:0;
+    font-size:12px;
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+  .foot a{color:var(--accent);}
+
+  .summary{display:none;}
+
+  @media (max-width:760px){
+    .app{
+      padding:max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      gap:16px;
+    }
+    .masthead{padding-bottom:12px;gap:4px;}
+    .lede{font-size:14px;}
+    .board{display:flex;flex-direction:column;gap:14px;}
+    .readout{order:-1;gap:10px;}
+    .panel{padding:16px;gap:20px;}
+    .gauge-card{padding:12px 8px 14px;}
+    .gauge-card svg{max-width:170px;}
+    .bar-value{font-size:30px;}
+
+    .summary{
+      display:flex;
+      position:fixed;
+      top:0;left:0;right:0;
+      z-index:20;
+      padding:calc(8px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left));
+      gap:12px;
+      background:var(--paper-raised);
+      border-bottom:1px solid var(--line);
+      box-shadow:0 4px 14px var(--shadow);
+      transform:translateY(-120%);
+      visibility:hidden;
+    }
+    .summary.show{transform:translateY(0);visibility:visible;}
+    @media (prefers-reduced-motion:no-preference){
+      .summary{transition:transform .25s ease, visibility 0s linear .25s;}
+      .summary.show{transition:transform .25s ease, visibility 0s;}
+    }
+    .sum-item{
+      flex:1;
+      display:grid;
+      grid-template-columns:auto 1fr;
+      grid-template-areas:"lab val" "lab psi";
+      align-items:center;
+      column-gap:8px;
+      min-width:0;
+    }
+    .sum-label{
+      grid-area:lab;
+      font-family:"Rajdhani",system-ui,sans-serif;
+      font-weight:700;
+      font-size:13px;
+      letter-spacing:0.06em;
+      text-transform:uppercase;
+    }
+    .sum-item[data-wheel="front"] .sum-label{color:var(--accent);}
+    .sum-item[data-wheel="rear"] .sum-label{color:var(--accent-2);}
+    .sum-val{grid-area:val;font-size:18px;font-weight:600;line-height:1.15;white-space:nowrap;}
+    .sum-psi{grid-area:psi;font-size:11.5px;line-height:1.15;color:var(--ink-soft);white-space:nowrap;}
+  }
+  @media (max-width:340px){
+    .readout{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="summary" id="summary" aria-hidden="true">
+  <div class="sum-item" data-wheel="front"><span class="sum-label">Foran</span><span class="sum-val mono">–</span><span class="sum-psi mono"></span></div>
+  <div class="sum-item" data-wheel="rear"><span class="sum-label">Bak</span><span class="sum-val mono">–</span><span class="sum-psi mono"></span></div>
+</div>
+
+<div class="app">
+  <header class="masthead">
+    <p class="eyebrow">Landevei · grus · terreng — basert på Silca</p>
+    <h1>Dekktrykk-kalkulator</h1>
+    <p class="lede">Finn raskeste og mest fornuftige lufttrykk foran og bak, basert på Silcas modell – tilpasset sykkeltype, vekt, målt dekkbredde, underlag og fart.</p>
+  </header>
+
+  <noscript><p class="foot">Kalkulatoren trenger JavaScript for å fungere.</p></noscript>
+
+  <main class="board">
+    <section class="panel" aria-label="Inndata">
+      <fieldset>
+        <legend>Sykkeltype</legend>
+        <div class="field">
+          <div class="segmented" role="group" aria-label="Sykkeltype" data-group="bikeType">
+            <button type="button" data-value="landevei" class="is-active" aria-pressed="true">Landevei</button>
+            <button type="button" data-value="grus" aria-pressed="false">Grus</button>
+            <button type="button" data-value="terreng" aria-pressed="false">Terreng</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rytter og sykkel</legend>
+        <div class="field">
+          <div class="field-row"><label for="riderWeight">Rytterens vekt</label><span class="field-hint">kg</span></div>
+          <input type="number" id="riderWeight" inputmode="decimal" min="20" max="150" step="1" value="75" autocomplete="off">
+        </div>
+        <div class="field">
+          <div class="field-row"><label for="bikeWeight">Sykkel + utstyr</label><span class="field-hint">kg</span></div>
+          <input type="number" id="bikeWeight" inputmode="decimal" min="3" max="40" step="0.5" value="8" autocomplete="off">
+          <span class="field-hint" id="weightHint">Sykkel, bagasje, flasker og annet du bærer med deg</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Hjul og dekk</legend>
+        <div class="field">
+          <label for="wheelDiam">Hjuldiameter</label>
+          <select id="wheelDiam"></select>
+        </div>
+        <div class="field">
+          <div class="field-row"><label for="tireWidth">Målt dekkbredde</label><span class="value-chip" id="widthValue">28 mm</span></div>
+          <input type="range" id="tireWidth" min="20" max="40" step="1" value="28" list="widthTicks">
+          <datalist id="widthTicks"></datalist>
+          <div class="tick-row" id="widthTickRow"></div>
+          <span class="field-hint">Mål bredden på dekket når det sitter på felgen og er pumpet opp — den kan avvike fra bredden som står på dekksiden.</span>
+        </div>
+        <div class="field">
+          <label for="tireType">Dekktype</label>
+          <select id="tireType"></select>
+          <span class="field-hint" id="tireHint"></span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Forhold</legend>
+        <div class="field">
+          <label for="surface">Underlag</label>
+          <select id="surface"></select>
+          <span class="field-hint" id="surfaceHint"></span>
+        </div>
+        <div class="field">
+          <label for="speed">Gjennomsnittsfart</label>
+          <select id="speed"></select>
+        </div>
+        <div class="field">
+          <label id="comfortLabel">Komfortjustering</label>
+          <div class="segmented" role="group" aria-labelledby="comfortLabel" data-group="comfort">
+            <button type="button" data-value="fast" class="is-active" aria-pressed="true">Raskest</button>
+            <button type="button" data-value="balanced" aria-pressed="false">Balansert</button>
+            <button type="button" data-value="comfort" aria-pressed="false">Komfort</button>
+          </div>
+          <span class="field-hint" id="comfortHint">Raskest er Silcas anbefaling uendret. Balansert og Komfort senker trykket for mykere kjøring og mer grep.</span>
+        </div>
+        <div class="switch-row">
+          <input type="checkbox" id="wetToggle">
+          <label for="wetToggle">Vått føre (senk trykket for bedre grep)</label>
+        </div>
+      </fieldset>
+
+      <details class="advanced">
+        <summary>Avansert: vektfordeling</summary>
+        <div class="field">
+          <label for="weightDist">Vektfordeling foran/bak</label>
+          <select id="weightDist"></select>
+          <span class="field-hint">Settes automatisk ut fra sykkeltype. Endre kun hvis du sitter uvanlig langt fram eller bak.</span>
+        </div>
+      </details>
+    </section>
+
+    <section class="readout" aria-label="Anbefalt trykk">
+      <div class="gauge-card" data-wheel="front">
+        <h2>Foran</h2>
+        <svg viewBox="0 0 320 320" role="img" aria-label="Måler for anbefalt trykk foran"></svg>
+        <div class="reading"><span class="bar-value mono">–</span><span class="unit">bar</span></div>
+        <div class="psi mono">≈ – psi</div>
+        <p class="clamp-note" hidden>Justert til trygt minimum/maksimum</p>
+      </div>
+      <div class="gauge-card" data-wheel="rear">
+        <h2>Bak</h2>
+        <svg viewBox="0 0 320 320" role="img" aria-label="Måler for anbefalt trykk bak"></svg>
+        <div class="reading"><span class="bar-value mono">–</span><span class="unit">bar</span></div>
+        <div class="psi mono">≈ – psi</div>
+        <p class="clamp-note" hidden>Justert til trygt minimum/maksimum</p>
+      </div>
+      <div class="alerts" id="alerts" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="notes">
+    <div class="callout">
+      <p class="callout-label">Viktig</p>
+      <p>Dette er et veiledende utgangspunkt, ikke en fasit. Sjekk alltid minimums- og maksimumstrykket som står trykt på dekksiden og felgen, og hold deg innenfor det. Krokløse (hookless) felger og tubeless-oppsett er spesielt følsomme for for høyt trykk. Øk aldri utover dekkets eller felgens grense.</p>
+    </div>
+    <details class="method">
+      <summary>Om beregningen</summary>
+      <p>Beregningen er basert på Silcas offentlige «Pro Tire Pressure Calculator» (silca.cc), som estimerer raskest mulig trykk ut fra målinger gjort med profesjonelle syklister på vedlikeholdt utstyr. Modellen tar systemvekt (rytter + sykkel + utstyr), underlag (en empirisk ruhetsverdi fra velodrom til grov grus), målt dekkbredde, hjuldiameter, dekkets karkasstype, gjennomsnittsfart og vektfordeling foran/bak. Underlaget er avgjørende: grovere underlag gir lavere trykk fordi dekket dempes bedre og taper mindre energi.</p>
+      <p>Siden Silca er optimalisert for fart, ligger anbefalingene ofte høyere enn mer komfortorienterte råd, spesielt på jevnt asfalt. Modellen er først og fremst bygget og testet for landevei og grus; verdiene for terreng er en utvidelse. Kalkulatoren advarer også om forhøyet risiko for punktering (klemmedefekt), slik Silca gjør, og foreslår da bredere dekk eller høyere trykk. «Komfortjustering» (Balansert −5 %, Komfort −10 %) og «Vått føre» (−8 %) er våre egne tilleggsjusteringer og er ikke en del av Silcas modell; «Raskest» viser Silcas tall uendret. Dette er en tilpasning av Silcas metode, ikke et produkt fra Silca – for offisielle tall, bruk <a href="https://silca.cc/pages/pro-tire-pressure-calculator" rel="noopener">Silcas egen kalkulator</a>.</p>
+    </details>
+    <p class="foot">Tips for iPhone: trykk på Del-ikonet i Safari og velg «Legg til på Hjem-skjerm» for å bruke kalkulatoren som en app. Innstillingene dine lagres kun på din egen enhet. · <a href="https://github.com/trymrepseth99-cpu/Dekktrykk-Kalkulator" rel="noopener">Kildekode</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const PSI_TO_BAR = 0.0689476;
+  const WET_FACTOR = 0.92;
+  const COMFORT_FACTOR = { fast: 1.00, balanced: 0.95, comfort: 0.90 };
+  const CX = 160, CY = 160;
+  const STORE_KEY = 'dekktrykk.v1';
+
+  // Roughness constant (K1) per surface: higher = smoother = higher pressure.
+  const SURFACES = [
+    { id:'track-indoor',  k1:354,   name:'Innendørs treverlodrom',            hint:'Glatt tre i velodrom – svært lav rullemotstand.' },
+    { id:'track-outdoor', k1:294,   name:'Utendørs betongbane',               hint:'Glatt betongbane utendørs.' },
+    { id:'new-pavement',  k1:261,   name:'Ny asfalt',                         hint:'Nylagt, jevn asfalt uten sprekker.' },
+    { id:'worn-pavement', k1:246.5, name:'Slitt asfalt / noen sprekker',      hint:'Eldre asfalt med litt sprekker og lappede partier.' },
+    { id:'cat1-gravel',   k1:235.5, name:'Grus kategori 1 (hardpakket)',      hint:'Hardpakket, jevn grusvei som nesten føles som asfalt.' },
+    { id:'poor-pavement', k1:225,   name:'Dårlig asfalt / steinsprøyt',       hint:'Grov asfalt, steinsprøyt (chipseal) eller mye hull og sprekker.' },
+    { id:'cat2-gravel',   k1:212.5, name:'Grus kategori 2',                   hint:'Grusvei med noe løsmasse og ujevnheter.' },
+    { id:'cobblestone',   k1:199,   name:'Brostein',                          hint:'Brostein – mye vibrasjon og energitap.' },
+    { id:'cat3-gravel',   k1:187,   name:'Grus kategori 3',                   hint:'Løs, grov grus med større stein og tydelige ujevnheter.' },
+    { id:'cat4-gravel',   k1:170,   name:'Grus kategori 4 (svært grovt)',     hint:'Svært grovt og løst underlag – grov grus, stein og stier.' }
+  ];
+
+  const TIRE_TYPES = [
+    { id:'race',    name:'Race-karkass (topp race-dekk)',                      hint:'Lett og smidig karkass – tåler og tjener på litt høyere trykk.' },
+    { id:'high',    name:'Høytytende dekk – tubeless / latexslange',           hint:'Fleksibel, god karkass. Utgangspunktet for modellen.' },
+    { id:'mid-tl',  name:'Mellomklasse – tubeless / latexslange',              hint:'Vanlig tubeless-dekk. Litt lavere trykk enn høytytende.' },
+    { id:'mid-bu',  name:'Mellomklasse – butylslange',                         hint:'Butylslange og vanlig karkass gir enda litt lavere anbefalt trykk.' },
+    { id:'punct',   name:'Punkteringsbeskyttet dekk – tubeless / latexslange', hint:'Stiv, kraftig karkass og/eller punkteringsbeskyttelse: lavest anbefalt trykk.' }
+  ];
+  function tireCoeff(id, widthMm){
+    switch (id){
+      case 'race': return widthMm <= 32 ? 1.05 : widthMm <= 40 ? 1.06 : widthMm <= 48 ? 1.07 : 1.08;
+      case 'high': return 1.00;
+      case 'mid-tl': return 0.97;
+      case 'mid-bu': return 0.94;
+      case 'punct': return 0.91;
+    }
+    return 1;
+  }
+
+  // Average speed in mph (as used by the model), shown to the user in km/h.
+  const SPEEDS = [
+    { mph:14,   name:'Rolig tur' },
+    { mph:15.5, name:'Rask enkeltsti' },
+    { mph:17.5, name:'Moderat gruppetur' },
+    { mph:19.5, name:'Rask gruppetur' },
+    { mph:21.5, name:'Konkurranse (kat. 1–3)' },
+    { mph:24,   name:'Profnivå' }
+  ];
+
+  const WEIGHT_DIST = {
+    even:     { front:1.000, back:1.000, name:'50/50 (triatlon / tempo / bane)' },
+    road:     { front:0.985, back:1.010, name:'48/52 (landevei)' },
+    gravel:   { front:0.975, back:1.020, name:'47/53 (grus)' },
+    mountain: { front:0.970, back:1.030, name:'46,5/53,5 (terreng)' }
+  };
+
+  const BIKE_TYPES = {
+    landevei: {
+      minBar: 2.5, maxBar: 9.0,
+      scale: { max: 10, minorStep: 1, majorStep: 2 },
+      wheelDiam: [ [622,'700C / 29″ (622 mm)'], [584,'650B / 27,5″ (584 mm)'], [571,'650C (571 mm)'] ], defaultWheelDiam: 622,
+      width: { min: 20, max: 40, default: 28, unit: 'mm', ticks: [20, 23, 25, 28, 30, 32, 35, 40] },
+      defaultSurface: 'worn-pavement', defaultSpeed: 17.5, defaultBikeWeight: 8, defaultDist: 'road'
+    },
+    grus: {
+      minBar: 1.0, maxBar: 5.5,
+      scale: { max: 6, minorStep: 0.5, majorStep: 1 },
+      wheelDiam: [ [622,'700C / 29″ (622 mm)'], [584,'650B / 27,5″ (584 mm)'] ], defaultWheelDiam: 622,
+      width: { min: 30, max: 50, default: 40, unit: 'mm', ticks: [30, 32, 35, 38, 40, 42, 45, 50] },
+      defaultSurface: 'cat2-gravel', defaultSpeed: 14, defaultBikeWeight: 10, defaultDist: 'gravel'
+    },
+    terreng: {
+      minBar: 0.7, maxBar: 3.2,
+      scale: { max: 4, minorStep: 0.5, majorStep: 1 },
+      wheelDiam: [ [622,'29″ (622 mm)'], [584,'27,5″ (584 mm)'], [559,'26″ (559 mm)'] ], defaultWheelDiam: 622,
+      width: { min: 45, max: 65, default: 58, unit: 'in', ticks: [45, 50, 53, 57, 61, 65] },
+      defaultSurface: 'cat4-gravel', defaultSpeed: 15.5, defaultBikeWeight: 13, defaultDist: 'mountain'
+    }
+  };
+
+  // Port of the published model: centre-point pressure from surface, weight,
+  // measured width and wheel diameter, then speed / weight-distribution / casing factors.
+  function model(weightKg, surface, widthMm, diamMm, speedMph, dist, tireId){
+    const K = 0.5 * (weightKg - 50) + surface.k1;
+    const w = widthMm;
+    const num = ((-0.00006 * w ** 3) + (0.0079 * w ** 2) - (0.4102 * w) + 12.725) * (-226.44);
+    const r = w + diamMm / 2;
+    const denom = (((-0.5 * 9.81) / (K * (20 / w)) + r) ** 2) - (r ** 2);
+    const cpp = num / denom;
+    const speedCoeff = 0.97 + (speedMph - 10) * (1.03 - 0.97) / (33 - 10);
+    const tire = tireCoeff(tireId, widthMm);
+    const front = cpp * speedCoeff * dist.front * tire;
+    const back  = cpp * speedCoeff * dist.back  * tire;
+
+    // Pinch-flat risk.
+    const v = speedMph * 0.44704;
+    const KE = 0.5 * weightKg * v ** 2;
+    const RE = 0.5 * (0.8 * w) * Math.sqrt(Math.max(0, K ** 2 - (0.8 * w) ** 2));
+    const PF = 2 * RE - KE;
+    const wInside = 6.5536 * K ** 4 + 6.5536 * (-160000 - 800 * weightKg * v ** 2 - weightKg ** 2 * v ** 4);
+    const Wnum = -2.56 * K ** 2 + Math.sqrt(Math.max(0, wInside));
+    const Wrec = Math.sqrt(Math.max(0, -Wnum / 3.2768));
+    const pNew = Math.sqrt((25 * weightKg ** 2 * v ** 4 + 20000 * weightKg * v ** 2 + 400000) / (64 * w ** 2) + 0.64 * w ** 2) / K;
+    return { front, back, PF, Wrec, safeFront: pNew * front, safeBack: pNew * back };
+  }
+
+  let currentType = BIKE_TYPES.landevei;
+  let currentTypeKey = 'landevei';
+  let comfortKey = 'fast';
+  const touched = { bikeWeight:false, surface:false, speed:false, dist:false };
+
+  function polar(r, deg){
+    const rad = deg * Math.PI / 180;
+    return { x: CX + r * Math.sin(rad), y: CY - r * Math.cos(rad) };
+  }
+  function angleForValue(v){
+    const max = currentType.scale.max;
+    const clamped = Math.max(0, Math.min(max, v));
+    return -120 + (clamped / max) * 240;
+  }
+  function arcPath(r, startDeg, endDeg){
+    const s = polar(r, startDeg), e = polar(r, endDeg);
+    const large = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+  }
+  function svgEl(tag, attrs){
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function fmtScaleLabel(v){
+    return Number.isInteger(v) ? String(v) : v.toFixed(1);
+  }
+
+  function buildDial(svg){
+    svg.innerHTML = '';
+    const { max, minorStep, majorStep } = currentType.scale;
+    svg.appendChild(svgEl('circle', { cx:CX, cy:CY, r:150, fill:'var(--paper-raised)', stroke:'var(--line)', 'stroke-width':1 }));
+    svg.appendChild(svgEl('path', { d:arcPath(122,-120,120), fill:'none', stroke:'var(--line)', 'stroke-width':18, 'stroke-linecap':'butt' }));
+    svg.appendChild(svgEl('path', { d:arcPath(122,-120, angleForValue(max*0.2)), fill:'none', stroke:'var(--danger)', 'stroke-width':18, opacity:0.45 }));
+    svg.appendChild(svgEl('path', { d:arcPath(122, angleForValue(max*0.85), 120), fill:'none', stroke:'var(--danger)', 'stroke-width':18, opacity:0.45 }));
+    const zone = svgEl('path', { d:'', fill:'none', stroke:'var(--safe)', 'stroke-width':18, class:'zone-arc' });
+    svg.appendChild(zone);
+
+    const steps = Math.round(max / minorStep);
+    for (let i=0; i<=steps; i++){
+      const v = i * minorStep;
+      const major = Math.abs(Math.round(v / majorStep) * majorStep - v) < 1e-6;
+      const a = angleForValue(v);
+      const outer = polar(112, a);
+      const inner = polar(major ? 98 : 104, a);
+      svg.appendChild(svgEl('line', { x1:outer.x, y1:outer.y, x2:inner.x, y2:inner.y, stroke:'var(--ink-soft)', 'stroke-width': major ? 2 : 1 }));
+      if (major){
+        const lp = polar(82, a);
+        const label = svgEl('text', { x:lp.x, y:lp.y, 'text-anchor':'middle', 'dominant-baseline':'middle', class:'mono', 'font-size':13, fill:'var(--ink-soft)' });
+        label.textContent = fmtScaleLabel(v);
+        svg.appendChild(label);
+      }
+    }
+
+    const needle = svgEl('g', { class:'needle' });
+    needle.appendChild(svgEl('line', { x1:CX, y1:CY, x2:CX, y2:CY-72, stroke:'var(--ink)', 'stroke-width':4, 'stroke-linecap':'round' }));
+    needle.appendChild(svgEl('circle', { cx:CX, cy:CY, r:11, fill:'var(--ink)' }));
+    svg.appendChild(needle);
+
+    return { needle, zone };
+  }
+
+  const frontCard = document.querySelector('.gauge-card[data-wheel="front"]');
+  const rearCard = document.querySelector('.gauge-card[data-wheel="rear"]');
+  const summary = document.getElementById('summary');
+  const gauges = {
+    front: { card: frontCard, svg: frontCard.querySelector('svg'), sum: summary.querySelector('[data-wheel="front"]') },
+    rear: { card: rearCard, svg: rearCard.querySelector('svg'), sum: summary.querySelector('[data-wheel="rear"]') }
+  };
+
+  function rebuildDials(){
+    Object.assign(gauges.front, buildDial(gauges.front.svg));
+    Object.assign(gauges.rear, buildDial(gauges.rear.svg));
+  }
+  rebuildDials();
+
+  function updateGauge(g, rawBar){
+    const clamped = Math.max(currentType.minBar, Math.min(currentType.maxBar, rawBar));
+    const wasClamped = Math.abs(clamped - rawBar) > 0.05;
+    const max = currentType.scale.max;
+    const angle = angleForValue(clamped);
+    const psi = Math.round(clamped / PSI_TO_BAR);
+    g.needle.setAttribute('transform', `rotate(${angle} ${CX} ${CY})`);
+    const low = Math.max(0, clamped - max*0.03), high = Math.min(max, clamped + max*0.03);
+    g.zone.setAttribute('d', arcPath(122, angleForValue(low), angleForValue(high)));
+    g.card.querySelector('.bar-value').textContent = clamped.toFixed(1);
+    g.card.querySelector('.psi').textContent = `≈ ${psi} psi`;
+    g.card.querySelector('.clamp-note').hidden = !wasClamped;
+    g.sum.querySelector('.sum-val').textContent = `${clamped.toFixed(1)} bar`;
+    g.sum.querySelector('.sum-psi').textContent = `${psi} psi`;
+  }
+
+  function fillSelect(sel, items, valueOf, labelOf){
+    sel.innerHTML = '';
+    items.forEach(it => {
+      const o = document.createElement('option');
+      o.value = valueOf(it); o.textContent = labelOf(it);
+      sel.appendChild(o);
+    });
+  }
+  function hasOption(sel, value){
+    return Array.from(sel.options).some(o => o.value === String(value));
+  }
+
+  const riderWeight = document.getElementById('riderWeight');
+  const bikeWeight = document.getElementById('bikeWeight');
+  const weightHint = document.getElementById('weightHint');
+  const wheelDiam = document.getElementById('wheelDiam');
+  const tireWidth = document.getElementById('tireWidth');
+  const widthValue = document.getElementById('widthValue');
+  const widthTickRow = document.getElementById('widthTickRow');
+  const widthTicksList = document.getElementById('widthTicks');
+  const tireType = document.getElementById('tireType');
+  const tireHint = document.getElementById('tireHint');
+  const surface = document.getElementById('surface');
+  const surfaceHint = document.getElementById('surfaceHint');
+  const speed = document.getElementById('speed');
+  const wetToggle = document.getElementById('wetToggle');
+  const weightDist = document.getElementById('weightDist');
+  const alerts = document.getElementById('alerts');
+
+  fillSelect(surface, SURFACES, s => s.id, s => s.name);
+  fillSelect(tireType, TIRE_TYPES, t => t.id, t => t.name);
+  fillSelect(speed, SPEEDS, s => s.mph, s => `${s.name} (${Math.round(s.mph * 1.609)} km/t)`);
+  fillSelect(weightDist, Object.entries(WEIGHT_DIST), e => e[0], e => e[1].name);
+  tireType.value = 'mid-tl';
+
+  function setActiveButton(name, value){
+    const group = document.querySelector(`.segmented[data-group="${name}"]`);
+    group.querySelectorAll('button').forEach(b => {
+      const on = b.dataset.value === value;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  document.querySelector('.segmented[data-group="bikeType"]').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    setActiveButton('bikeType', btn.dataset.value);
+    applyBikeType(btn.dataset.value);
+    recompute();
+  });
+  document.querySelector('.segmented[data-group="comfort"]').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    comfortKey = btn.dataset.value;
+    setActiveButton('comfort', comfortKey);
+    recompute();
+  });
+
+  bikeWeight.addEventListener('input', () => { touched.bikeWeight = true; });
+  surface.addEventListener('input', () => { touched.surface = true; });
+  speed.addEventListener('input', () => { touched.speed = true; });
+  weightDist.addEventListener('input', () => { touched.dist = true; });
+
+  function formatWidth(mm){
+    return currentType.width.unit === 'in' ? `${(mm / 25.4).toFixed(2)}″ (${mm} mm)` : `${mm} mm`;
+  }
+
+  function applyBikeType(typeKey){
+    currentTypeKey = typeKey;
+    currentType = BIKE_TYPES[typeKey];
+    const w = currentType.width;
+
+    const oldWidth = parseFloat(tireWidth.value);
+    const nextWidth = (oldWidth >= w.min && oldWidth <= w.max) ? oldWidth : w.default;
+    tireWidth.min = w.min; tireWidth.max = w.max; tireWidth.step = 1;
+    tireWidth.value = nextWidth;
+
+    widthTickRow.innerHTML = '';
+    widthTicksList.innerHTML = '';
+    w.ticks.forEach(v => {
+      const span = document.createElement('span');
+      span.textContent = v;
+      widthTickRow.appendChild(span);
+      const opt = document.createElement('option');
+      opt.value = v;
+      widthTicksList.appendChild(opt);
+    });
+
+    const oldDiam = parseFloat(wheelDiam.value);
+    fillSelect(wheelDiam, currentType.wheelDiam, d => d[0], d => d[1]);
+    wheelDiam.value = currentType.wheelDiam.some(d => d[0] === oldDiam) ? oldDiam : currentType.defaultWheelDiam;
+
+    if (!touched.bikeWeight) bikeWeight.value = currentType.defaultBikeWeight;
+    if (!touched.surface) surface.value = currentType.defaultSurface;
+    if (!touched.speed) speed.value = currentType.defaultSpeed;
+    if (!touched.dist) weightDist.value = currentType.defaultDist;
+
+    rebuildDials();
+  }
+
+  function barText(psi){
+    return `${(psi * PSI_TO_BAR).toFixed(1).replace('.', ',')} bar (${Math.round(psi)} psi)`;
+  }
+
+  function saveState(){
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        bikeType: currentTypeKey,
+        rider: riderWeight.value, bike: bikeWeight.value,
+        width: tireWidth.value, diam: wheelDiam.value,
+        tire: tireType.value, surface: surface.value, speed: speed.value, dist: weightDist.value,
+        comfort: comfortKey, wet: wetToggle.checked, touched
+      }));
+    } catch (e) {}
+  }
+  function loadState(){
+    try {
+      const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+      return s && typeof s === 'object' ? s : null;
+    } catch (e) { return null; }
+  }
+  function applySaved(s){
+    if (!s) return;
+    const num = v => { const n = parseFloat(v); return isFinite(n) ? n : null; };
+    if (num(s.rider) !== null) riderWeight.value = num(s.rider);
+    if (num(s.bike) !== null) bikeWeight.value = num(s.bike);
+    const wv = num(s.width);
+    if (wv !== null && wv >= currentType.width.min && wv <= currentType.width.max) tireWidth.value = wv;
+    if (hasOption(wheelDiam, s.diam)) wheelDiam.value = s.diam;
+    if (hasOption(tireType, s.tire)) tireType.value = s.tire;
+    if (hasOption(surface, s.surface)) surface.value = s.surface;
+    if (hasOption(speed, s.speed)) speed.value = s.speed;
+    if (hasOption(weightDist, s.dist)) weightDist.value = s.dist;
+    if (COMFORT_FACTOR[s.comfort] !== undefined){ comfortKey = s.comfort; setActiveButton('comfort', comfortKey); }
+    wetToggle.checked = !!s.wet;
+    if (s.touched && typeof s.touched === 'object'){
+      Object.keys(touched).forEach(k => { touched[k] = !!s.touched[k]; });
+    }
+  }
+
+  function recompute(){
+    const riderKg = parseFloat(riderWeight.value) || 0;
+    const bikeKg = parseFloat(bikeWeight.value) || 0;
+    const totalKg = riderKg + bikeKg;
+    const widthMm = parseFloat(tireWidth.value);
+    const diamMm = parseFloat(wheelDiam.value);
+    const surf = SURFACES.find(s => s.id === surface.value);
+    const speedMph = parseFloat(speed.value);
+    const dist = WEIGHT_DIST[weightDist.value];
+
+    widthValue.textContent = formatWidth(widthMm);
+    surfaceHint.textContent = surf.hint;
+    tireHint.textContent = TIRE_TYPES.find(t => t.id === tireType.value).hint;
+
+    const weightOk = totalKg >= 34 && totalKg <= 205;
+    weightHint.textContent = weightOk
+      ? `Total systemvekt: ${totalKg.toFixed(1).replace('.0','')} kg`
+      : 'Systemvekten må være mellom 34 og 205 kg for at modellen skal gjelde.';
+    weightHint.classList.toggle('warn', !weightOk);
+    const calcWeight = Math.max(34, Math.min(205, totalKg));
+
+    const res = model(calcWeight, surf, widthMm, diamMm, speedMph, dist, tireType.value);
+    const adjust = (wetToggle.checked ? WET_FACTOR : 1) * COMFORT_FACTOR[comfortKey];
+    const frontPsi = res.front * adjust;
+    const rearPsi = res.back * adjust;
+
+    updateGauge(gauges.front, frontPsi * PSI_TO_BAR);
+    updateGauge(gauges.rear, rearPsi * PSI_TO_BAR);
+
+    const msgs = [];
+    if (res.PF <= 0 && isFinite(res.PF)){
+      const severe = res.PF < -500;
+      const wRec = Math.ceil(res.Wrec);
+      let t = `<strong>${severe ? 'Ekstrem' : 'Økt'} risiko for punktering (klemmedefekt).</strong> `;
+      if (isFinite(wRec) && wRec > widthMm) t += `Velg helst et dekk med målt bredde på minst <strong>${wRec} mm</strong>. `;
+      const safeOk = Math.max(res.safeFront, res.safeBack) * PSI_TO_BAR <= currentType.maxBar;
+      t += safeOk
+        ? `Passer ikke bredere dekk, kan du kjøre ikke-optimale trykk på <strong>${barText(res.safeFront)}</strong> foran og <strong>${barText(res.safeBack)}</strong> bak for å beskytte felger og dekk.`
+        : `Trykket som skulle til for å unngå punktering ville ligget utenfor det som er forsvarlig for dekk og felg – løsningen er et bredere dekk.`;
+      msgs.push({ html:t, severe });
+    }
+    if (frontPsi > 70 || rearPsi > 70){
+      msgs.push({ html:`<strong>Over 70 psi (4,8 bar).</strong> Har du krokløse (hookless) felger, sjekk felgprodusentens maksgrense – den er ofte rundt 5 bar (72 psi). Tubeless-oppsett er følsomme for for høyt trykk.`, severe:false });
+    }
+    alerts.innerHTML = '';
+    msgs.forEach(m => {
+      const d = document.createElement('div');
+      d.className = 'alert' + (m.severe ? ' severe' : '');
+      d.innerHTML = m.html;
+      alerts.appendChild(d);
+    });
+
+    saveState();
+  }
+
+  [riderWeight, bikeWeight, wheelDiam, tireWidth, tireType, surface, speed, weightDist].forEach(el => {
+    el.addEventListener('input', recompute);
+    el.addEventListener('change', recompute);
+  });
+  wetToggle.addEventListener('change', recompute);
+
+  // Floating summary on phones once the gauges scroll out of view.
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(entries => {
+      const e = entries[0];
+      summary.classList.toggle('show', !e.isIntersecting && e.boundingClientRect.top < 0);
+    }, { threshold: 0 }).observe(frontCard);
+  }
+
+  const saved = loadState();
+  const startType = saved && BIKE_TYPES[saved.bikeType] ? saved.bikeType : 'landevei';
+  setActiveButton('bikeType', startType);
+  applyBikeType(startType);
+  applySaved(saved);
+  recompute();
+})();
+</script>
+</body>
+</html>
