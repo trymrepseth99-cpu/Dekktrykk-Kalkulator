@@ -10,9 +10,7 @@ Finn anbefalt lufttrykk foran og bak ut fra sykkeltype, vekt, målt dekkbredde, 
 
 ## Om beregningen
 
-Modellen er en tilpasning av Silcas offentlige Pro Tire Pressure Calculator (https://silca.cc/pages/pro-tire-pressure-calculator), som estimerer raskest mulig trykk. Dette er ikke et produkt fra Silca og er ikke tilknyttet Silca. For offisielle tall, bruk Silcas egen kalkulator.
-
-Egne tillegg som ikke er en del av Silcas modell: komfortjustering (Balansert −5 %, Komfort −10 %) og vått føre (−8 %).
+Modellen estimerer raskest mulig trykk. Tillegg utenfor selve modellen: komfortjustering (Balansert −5 %, Komfort −10 %) og vått føre (−8 %).
 
 Resultatet er veiledende. Sjekk alltid min/maks-trykk som står på dekk og felg.
 
