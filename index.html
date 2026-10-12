@@ -581,7 +581,7 @@
   <footer class="notes">
     <div class="callout">
       <p class="callout-label">Viktig</p>
-      <p>Dette er et veiledende utgangspunkt, ikke en fasit. Sjekk alltid minimums- og maksimumstrykket som står trykt på dekksiden og felgen, og hold deg innenfor det. Krokløse (hookless) felger og tubeless-oppsett er spesielt følsomme for for høyt trykk. Øk aldri utover dekkets eller felgens grense.</p>
+      <p>Dette er et veiledende utgangspunkt, ikke en fasit. Sjekk alltid minimums- og maksimumstrykket som står trykt på dekksiden og felgen, og hold deg innenfor det. Hookless-felger og tubeless-oppsett er spesielt følsomme for for høyt trykk. Øk aldri utover dekkets eller felgens grense.</p>
     </div>
     <details class="method">
       <summary>Om beregningen</summary>
@@ -973,7 +973,7 @@
       msgs.push({ html:t, severe });
     }
     if (frontPsi > 70 || rearPsi > 70){
-      msgs.push({ html:`<strong>Over 70 psi (4,8 bar).</strong> Har du krokløse (hookless) felger, sjekk felgprodusentens maksgrense – den er ofte rundt 5 bar (72 psi). Tubeless-oppsett er følsomme for for høyt trykk.`, severe:false });
+      msgs.push({ html:`<strong>Over 70 psi (4,8 bar).</strong> Har du hookless-felger, sjekk felgprodusentens maksgrense – den er ofte rundt 5 bar (72 psi). Tubeless-oppsett er følsomme for for høyt trykk.`, severe:false });
     }
     alerts.innerHTML = '';
     msgs.forEach(m => {
