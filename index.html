@@ -585,7 +585,7 @@
     </div>
     <details class="method">
       <summary>Om beregningen</summary>
-      <p>Beregningen estimerer raskest mulig trykk ut fra en empirisk modell basert på målinger gjort med profesjonelle syklister på vedlikeholdt utstyr. Modellen tar systemvekt (rytter + sykkel + utstyr), underlag (en empirisk ruhetsverdi fra velodrom til grov grus), målt dekkbredde, hjuldiameter, dekkets karkasstype, gjennomsnittsfart og vektfordeling foran/bak. Underlaget er avgjørende: grovere underlag gir lavere trykk fordi dekket dempes bedre og taper mindre energi.</p>
+      <p>Beregningen estimerer raskest mulig trykk ut fra en empirisk modell basert på målinger gjort med profesjonelle syklister på vedlikeholdt utstyr. Modellen tar systemvekt (rytter + sykkel + utstyr), underlag (en empirisk ruhetsverdi fra velodrom til grov grus), målt dekkbredde, hjuldiameter, dekkets kvalitet (hvor lett og smidig det er), gjennomsnittsfart og vektfordeling foran/bak. Underlaget er avgjørende: grovere underlag gir lavere trykk fordi dekket dempes bedre og taper mindre energi.</p>
       <p>Siden modellen er optimalisert for fart, ligger anbefalingene ofte høyere enn mer komfortorienterte råd, spesielt på jevnt asfalt. Modellen er først og fremst bygget og testet for landevei og grus; verdiene for terreng er en utvidelse. Kalkulatoren advarer også om forhøyet risiko for punktering (klemmedefekt), og foreslår da bredere dekk eller høyere trykk. «Komfortjustering» (Balansert −5 %, Komfort −10 %) og «Vått føre» (−8 %) er tilleggsjusteringer utenfor selve modellen; «Raskest» viser modellens tall uendret.</p>
     </details>
     <p class="foot">Tips for iPhone: trykk på Del-ikonet i Safari og velg «Legg til på Hjem-skjerm» for å bruke kalkulatoren som en app. Innstillingene dine lagres kun på din egen enhet. · <a href="https://github.com/trymrepseth99-cpu/Dekktrykk-Kalkulator" rel="noopener">Kildekode</a></p>
@@ -615,11 +615,11 @@
   ];
 
   const TIRE_TYPES = [
-    { id:'race',    name:'Race-karkass (topp race-dekk)',                      hint:'Lett og smidig karkass – tåler og tjener på litt høyere trykk.' },
-    { id:'high',    name:'Høytytende dekk – tubeless / latexslange',           hint:'Fleksibel, god karkass. Utgangspunktet for modellen.' },
+    { id:'race',    name:'Race-dekk (lett og smidig toppdekk)',                  hint:'Veldig lett og smidig dekk – tåler og tjener på litt høyere trykk.' },
+    { id:'high',    name:'Høytytende dekk – tubeless / latexslange',           hint:'Fleksibelt dekk av høy kvalitet. Utgangspunktet for modellen.' },
     { id:'mid-tl',  name:'Mellomklasse – tubeless / latexslange',              hint:'Vanlig tubeless-dekk. Litt lavere trykk enn høytytende.' },
-    { id:'mid-bu',  name:'Mellomklasse – butylslange',                         hint:'Butylslange og vanlig karkass gir enda litt lavere anbefalt trykk.' },
-    { id:'punct',   name:'Punkteringsbeskyttet dekk – tubeless / latexslange', hint:'Stiv, kraftig karkass og/eller punkteringsbeskyttelse: lavest anbefalt trykk.' }
+    { id:'mid-bu',  name:'Mellomklasse – butylslange',                         hint:'Butylslange og et vanlig dekk gir enda litt lavere anbefalt trykk.' },
+    { id:'punct',   name:'Punkteringsbeskyttet dekk – tubeless / latexslange', hint:'Stivt, kraftig dekk og/eller ekstra punkteringsbeskyttelse: lavest anbefalt trykk.' }
   ];
   function tireCoeff(id, widthMm){
     switch (id){
